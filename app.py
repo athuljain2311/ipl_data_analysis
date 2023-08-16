@@ -178,6 +178,8 @@ elif choice == 'Year-wise Analysis':
 
 
     franchises = sorted(player_stats['TeamName'][player_stats['Year'] == year].unique().tolist())
+    if year == 2009:
+        franchises.remove('Delhi Capitals')
     franchise = st.selectbox('Select a Franchise',franchises)
 
     st.header('')
@@ -304,4 +306,43 @@ elif choice == 'Franchise-wise Analysis':
     st.plotly_chart(headToHeadAge(player_stats,franchise1,franchise2,head_to_head))
 
 else:
-    pass
+
+    st.title('Player-wise Analysis')
+
+    players = sorted(player_stats.Name.unique().tolist(),key=lambda name:name.lower())
+    player = st.sidebar.selectbox('Select a Player',players)
+
+    st.header('')
+    col1,col2,col3 = st.columns(3)
+
+    with col1:
+        st.subheader('Date of Birth')
+        st.subheader(player_stats[player_stats['Name'] == player]['PlayerDOB'].iloc[0])
+
+    with col2:
+        st.subheader('Batting Style')
+        style = player_stats[player_stats['Name'] == player]['BattingStyle'].iloc[0]
+        if style == 'rhb':
+            st.subheader('Right Handed Batsman')
+        else:
+            st.subheader('Left Handed Batsman')
+
+    with col3:
+        st.subheader('Nationality')
+        st.subheader(player_stats[player_stats['Name'] == player]['Nation'].iloc[0])
+
+    st.header('')
+    st.subheader('Teams Represented')
+    st.table(player_stats[player_stats['Name'] == player][['TeamName','Year']].rename(columns={'TeamName':'Team Name'}))
+
+    st.subheader('Career Stats')
+    st.plotly_chart(batStats(player_stats,player))
+    st.plotly_chart(bowlStats(player_stats,player))
+
+    st.subheader('Year-wise Stats')
+    st.plotly_chart(runsPerSeason(player_stats,player))
+    st.plotly_chart(strikeRatePerSeason(player_stats,player))
+    st.plotly_chart(averagePerSeason(player_stats,player))
+    st.plotly_chart(wicketsPerSeason(player_stats,player))
+    st.plotly_chart(bowlingStrikeRatePerSeason(player_stats,player))
+    st.plotly_chart(economyPerSeason(player_stats,player))
